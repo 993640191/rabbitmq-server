@@ -16,6 +16,8 @@
          get_context_before_logging_init/1,
          get_context_after_logging_init/1,
          get_context_after_reloading_env/1,
+         has_var_been_overridden/1,
+         has_var_been_overridden/2,
          dbg_config/0,
          get_used_env_vars/0,
          log_process_env/0,
@@ -210,6 +212,15 @@ update_context(Context, Key, Value, Origin)
   when ?origin_is_valid(Origin) ->
     Context#{Key => Value,
              var_origins => #{Key => Origin}}.
+
+has_var_been_overridden(Var) ->
+    has_var_been_overridden(get_context(), Var).
+
+has_var_been_overridden(#{var_origins := Origins}, Var) ->
+    case maps:get(Var, Origins, default) of
+        default -> false;
+        _       -> true
+    end.
 
 get_used_env_vars() ->
     lists:filter(
